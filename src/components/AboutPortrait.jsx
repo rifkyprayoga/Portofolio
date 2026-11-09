@@ -2,25 +2,38 @@ import { useRef } from 'react'
 import { profile } from '../data/profile'
 
 // Potret About: foto utama, dan foto kedua "terintip" di lingkaran yang mengikuti kursor.
-// Tanpa kursor, foto kedua sesekali berkedip muncul. Di layar sentuh: tap untuk berganti.
+// Di HP: tekan & tahan jari di foto → lingkaran muncul di bawah jari (geser ke samping
+// untuk menggerakkannya); angkat jari atau mulai scroll → kembali ke foto utama.
+// Tanpa interaksi, foto kedua sesekali berkedip muncul.
 export default function AboutPortrait() {
   const stageRef = useRef(null)
   const figureRef = useRef(null)
+  const touching = useRef(false)
 
-  const onPointerMove = (e) => {
-    if (e.pointerType === 'touch') return
+  const reveal = (e) => {
     const stage = stageRef.current
     const r = figureRef.current.getBoundingClientRect()
     stage.style.setProperty('--hover-x', `${((e.clientX - r.left) / r.width) * 100}%`)
     stage.style.setProperty('--hover-y', `${((e.clientY - r.top) / r.height) * 100}%`)
     stage.classList.add('is-revealing')
   }
-  const onPointerLeave = (e) => {
-    if (e.pointerType === 'touch') return
+  const hide = () => {
+    touching.current = false
     stageRef.current.classList.remove('is-revealing')
   }
+
+  const onPointerDown = (e) => {
+    if (e.pointerType !== 'touch') return
+    touching.current = true
+    reveal(e)
+  }
+  const onPointerMove = (e) => {
+    // mouse: ikuti kursor; jari: hanya selama masih menempel di foto
+    if (e.pointerType === 'touch' && !touching.current) return
+    reveal(e)
+  }
   const onPointerUp = (e) => {
-    if (e.pointerType === 'touch') stageRef.current.classList.toggle('is-swapped')
+    if (e.pointerType === 'touch') hide()
   }
 
   return (
@@ -28,9 +41,12 @@ export default function AboutPortrait() {
       className="about-portrait"
       ref={stageRef}
       data-reveal
+      onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
-      onPointerLeave={onPointerLeave}
       onPointerUp={onPointerUp}
+      onPointerCancel={hide}
+      onPointerLeave={hide}
+      onContextMenu={(e) => e.preventDefault()}
     >
       <div className="about-portrait-orbits" aria-hidden="true">
         <span className="orbit orbit-1" />

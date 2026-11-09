@@ -1,6 +1,7 @@
 import { ArrowUp } from 'lucide-react'
 import { profile, socials } from '../data/profile'
 import BrandIcon from './BrandIcon'
+import Logo from './Logo'
 
 export default function Footer() {
   return (
@@ -8,7 +9,7 @@ export default function Footer() {
       <div className="container">
         <div className="footer-top">
           <div className="footer-brand">
-            <span className="brand-mark">{profile.initials}</span>
+            <Logo className="footer-logo" />
             <div>
               <strong>{profile.name}</strong>
               <p>{profile.tagline}</p>

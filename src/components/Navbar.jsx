@@ -62,7 +62,7 @@ export default function Navbar() {
   return (
     <header className={`navbar ${scrolled ? 'is-scrolled' : ''}`}>
       <nav className="navbar-inner glass" aria-label="Navigasi utama">
-        <a href="#Home" className="navbar-brand" onClick={go('Home')} aria-label="RFKYDEP — kembali ke beranda">
+        <a href="#Home" className="navbar-brand" onClick={go('Home')} aria-label="KYDEP — kembali ke beranda">
           <Logo />
         </a>
 

@@ -320,17 +320,19 @@ export function MusicProvider({ active, children }) {
     }
   }, [])
 
-  // ---------- mulai otomatis saat web dibuka ----------
+  // ---------- mulai otomatis sejak layar loading ----------
+  // play() dipanggil langsung saat web dibuka — tidak menunggu intro.mp3 selesai
+  // diunduh; browser mulai membunyikan begitu potongan pertamanya masuk. Bila
+  // browser memblokir (belum ada interaksi), lagu mulai pada klik / tap / tombol pertama.
   useEffect(() => {
-    if (!active || started.current || userPaused.current || !soundEnabled) return
+    if (started.current || userPaused.current || !soundEnabled) return
     wantPlay.current = true
     setStatus((s) => (s === 'idle' ? 'waiting' : s))
     if (phaseRef.current === 'intro') playIntro()
-  }, [active, soundEnabled, playIntro])
+  }, [soundEnabled, playIntro])
 
-  // diblokir browser → mulai pada interaksi pertama di mana saja
+  // diblokir browser → mulai pada interaksi pertama di mana saja (termasuk saat loading)
   useEffect(() => {
-    if (!active) return
     const onGesture = (e) => {
       if (started.current || userPaused.current || !wantPlay.current) return
       // klik di kontrol musik / daftar lagu ditangani tombolnya sendiri — jangan
@@ -347,7 +349,7 @@ export function MusicProvider({ active, children }) {
       window.removeEventListener('keydown', onGesture, opts)
       window.removeEventListener('touchend', onGesture, opts)
     }
-  }, [active, play])
+  }, [play])
 
   // section Soundtrack mendaftarkan diri; di halaman lain muncul mini-player
   const registerSection = useCallback((el) => {
