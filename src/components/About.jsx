@@ -5,7 +5,7 @@ import AboutPortrait from './AboutPortrait'
 export default function About() {
   const techCount = new Set(techStack.flatMap((g) => g.skills.map((s) => s.name))).size
   const stats = [
-    { icon: Code2, value: projects.length, label: 'Projek', sub: 'web & mobile' },
+    { icon: Code2, value: projects.length, label: 'Projek', sub: 'web, mobile & otomasi' },
     { icon: Cpu, value: techCount, label: 'Teknologi', sub: 'yang dikuasai' },
     { icon: Layers, value: techStack.length, label: 'Bidang', sub: 'mobile → deploy' },
   ]

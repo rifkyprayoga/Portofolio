@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { ArrowLeft, ArrowUpRight, ChevronRight } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Check, ChevronRight, Lock } from 'lucide-react'
 import { projects } from '../data/profile'
 import BrandIcon from './BrandIcon'
 import ProjectThumb from './ProjectThumb'
@@ -39,7 +39,38 @@ export default function ProjectDetail({ id, onBack }) {
         <div className="detail-layout">
           <div className="detail-copy">
             <h1 className="detail-title text-gradient">{project.title}</h1>
+            <dl className="detail-facts">
+              {project.year && (
+                <div>
+                  <dt className="mono">Tahun</dt>
+                  <dd>{project.year}</dd>
+                </div>
+              )}
+              {project.role && (
+                <div>
+                  <dt className="mono">Peran</dt>
+                  <dd>{project.role}</dd>
+                </div>
+              )}
+              <div>
+                <dt className="mono">Kategori</dt>
+                <dd>{project.category}</dd>
+              </div>
+            </dl>
             <p className="detail-desc">{project.longDesc}</p>
+            {project.highlights?.length > 0 && (
+              <>
+                <h2 className="detail-subtitle mono">Fitur Utama</h2>
+                <ul className="detail-highlights">
+                  {project.highlights.map((h) => (
+                    <li key={h}>
+                      <Check size={16} />
+                      <span>{h}</span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
             <h2 className="detail-subtitle mono">Teknologi</h2>
             <div className="chip-row">
               {project.tags.map((t) => (
@@ -60,6 +91,11 @@ export default function ProjectDetail({ id, onBack }) {
                 </a>
               )}
             </div>
+            {project.note && (
+              <p className="detail-note">
+                <Lock size={14} /> {project.note}
+              </p>
+            )}
           </div>
           <div className="detail-preview">
             <div className="detail-preview-glow" />

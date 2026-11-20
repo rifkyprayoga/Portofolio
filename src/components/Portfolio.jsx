@@ -11,6 +11,10 @@ const tabs = [
   { id: 'stack', label: 'Tech Stack', icon: Cpu },
 ]
 
+const ALL = 'Semua'
+// urutan filter mengikuti urutan kemunculan kategori di data
+const filters = [ALL, ...new Set(projects.map((p) => p.category))]
+
 function SkillLogo({ skill }) {
   const [failed, setFailed] = useState(false)
   if (failed || !skill.logo) return <span className="skill-fallback">{skill.name.slice(0, 2)}</span>
@@ -50,7 +54,9 @@ function CertGrid({ items, onOpen, emptyText, icon }) {
 
 export default function Portfolio({ onOpenProject }) {
   const [tab, setTab] = useState('projects')
+  const [filter, setFilter] = useState(ALL)
   const [viewer, setViewer] = useState(null)
+  const shown = filter === ALL ? projects : projects.filter((p) => p.category === filter)
   const { play } = useSound()
 
   useEffect(() => {
@@ -94,15 +100,40 @@ export default function Portfolio({ onOpenProject }) {
 
         <div className="tab-panel" key={tab}>
           {tab === 'projects' && (
-            <div className="project-grid">
-              {projects.map((p, i) => (
+            <div className="filter-row" role="group" aria-label="Filter kategori projek">
+              {filters.map((f) => (
+                <button
+                  key={f}
+                  className={`filter-chip ${filter === f ? 'is-active' : ''}`}
+                  aria-pressed={filter === f}
+                  onClick={() => {
+                    setFilter(f)
+                    play('click')
+                  }}
+                >
+                  {f}
+                  <span className="filter-count mono">
+                    {f === ALL ? projects.length : projects.filter((p) => p.category === f).length}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+          {tab === 'projects' && (
+            <div className="project-grid" key={filter}>
+              {shown.map((p, i) => (
                 <article key={p.id} className="project-card metal-border" style={{ '--d': `${i * 80}ms` }}>
                   <div className="project-card-inner">
                     <div className="project-thumb">
                       <ProjectThumb project={p} />
                       <span className="project-cat mono">{p.category}</span>
+                      {p.badge && <span className="project-badge mono">{p.badge}</span>}
                     </div>
                     <div className="project-body">
+                      <div className="project-meta mono">
+                        {p.year && <span>{p.year}</span>}
+                        {p.role && <span>{p.role}</span>}
+                      </div>
                       <h3>{p.title}</h3>
                       <p>{p.description}</p>
                       <div className="chip-row">
