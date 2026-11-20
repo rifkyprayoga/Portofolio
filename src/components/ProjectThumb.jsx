@@ -1,3 +1,5 @@
+import { useLang } from '../lib/i18n'
+
 // Thumbnail proyek: gambar asli jika ada; jika tidak, mockup sesuai jenis proyek
 // (project.kind: 'mobile' | 'web' | 'terminal' | 'desktop')
 
@@ -86,8 +88,9 @@ function DesktopMock({ lines = [] }) {
 }
 
 export default function ProjectThumb({ project, large = false }) {
+  const { t, tx } = useLang()
   if (project.image)
-    return <img src={project.image} alt={`Tampilan ${project.title}`} className="thumb-img" loading="lazy" />
+    return <img src={project.image} alt={t('pf.thumbAlt', { title: tx(project.title) })} className="thumb-img" loading="lazy" />
 
   const kind = project.kind || 'mobile'
   return (
@@ -97,10 +100,10 @@ export default function ProjectThumb({ project, large = false }) {
       aria-hidden="true"
     >
       {kind === 'web' && <BrowserMock />}
-      {kind === 'terminal' && <TerminalMock lines={project.preview} />}
-      {kind === 'desktop' && <DesktopMock lines={project.preview} />}
+      {kind === 'terminal' && <TerminalMock lines={tx(project.preview)} />}
+      {kind === 'desktop' && <DesktopMock lines={tx(project.preview)} />}
       {kind === 'mobile' && <PhoneMock />}
-      <span className="thumb-title">{project.title}</span>
+      <span className="thumb-title">{tx(project.title)}</span>
     </div>
   )
 }

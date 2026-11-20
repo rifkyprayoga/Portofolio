@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { profile } from '../data/profile'
 import { useSound } from '../lib/sound'
 import { CARD, STRAP_TEX_RATIO, drawCardBack, drawCardFront, drawStrap, loadFaceAssets } from './lanyardTextures'
+import { useLang } from '../lib/i18n'
 
 // ---------- konstanta fisika & bentuk ----------
 const SEG = 10 // jumlah ruas tali
@@ -128,6 +129,7 @@ function buildRibbonGeometry() {
 
 // Kartu ID 3D yang tergantung tali — bisa ditarik, dilempar, dan dibalik dengan klik
 export default function Lanyard() {
+  const { t, tx } = useLang()
   const stageRef = useRef(null)
   const flipRef = useRef(null)
   const { play } = useSound()
@@ -704,11 +706,11 @@ export default function Lanyard() {
       ref={stageRef}
       tabIndex={0}
       role="button"
-      aria-label={`Kartu ID ${profile.name}, ${profile.role}. Tekan Enter untuk membalik kartu.`}
+      aria-label={t('lanyard.aria', { name: profile.name, role: tx(profile.role) })}
       onKeyDown={onKeyDown}
     >
       <p className="lanyard-hint" aria-hidden="true">
-        tarik · klik untuk membalik
+        {t('lanyard.hint')}
       </p>
     </div>
   )

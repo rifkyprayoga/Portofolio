@@ -3,6 +3,7 @@ import { ArrowUpRight, Mail } from 'lucide-react'
 import { profile, socials } from '../data/profile'
 import { useSound } from '../lib/sound'
 import BrandIcon from './BrandIcon'
+import { useLang } from '../lib/i18n'
 
 // Three.js cukup berat — muat lanyard 3D terpisah agar halaman cepat tampil
 const Lanyard = lazy(() => import('./Lanyard'))
@@ -36,7 +37,8 @@ function useTypewriter(words) {
 }
 
 export default function Hero() {
-  const typed = useTypewriter(profile.roles)
+  const { t, tx } = useLang()
+  const typed = useTypewriter(tx(profile.roles))
   const { play } = useSound()
   const [first, ...rest] = profile.name.split(' ')
 
@@ -45,7 +47,7 @@ export default function Hero() {
       <div className="container hero-inner">
         <div className="hero-copy">
           <span className="eyebrow hero-intro" data-hero>
-            <span className="pulse-dot" /> Tersedia untuk proyek baru
+            <span className="pulse-dot" /> {t('hero.available')}
           </span>
           <h1 className="hero-title" data-hero>
             <span className="text-gradient">{first}</span>
@@ -57,18 +59,18 @@ export default function Hero() {
             <span className="cursor" />
           </div>
           <p className="hero-desc" data-hero>
-            {profile.heroDescription}
+            {tx(profile.heroDescription)}
           </p>
           <div className="hero-actions" data-hero>
             <a href="#Portofolio" className="btn-primary" onClick={() => play('click')} onMouseEnter={() => play('hover')}>
-              Lihat Projek <ArrowUpRight size={16} />
+              {t('hero.viewProjects')} <ArrowUpRight size={16} />
             </a>
             <a href="#Contact" className="btn-secondary" onClick={() => play('click')} onMouseEnter={() => play('hover')}>
-              Hubungi Saya <Mail size={15} />
+              {t('hero.contact')} <Mail size={15} />
             </a>
           </div>
           <div className="hero-socials" data-hero>
-            <span className="hero-socials-label mono">Temukan saya</span>
+            <span className="hero-socials-label mono">{t('hero.findMe')}</span>
             {socials.map((s) => (
               <a
                 key={s.id}
@@ -90,7 +92,7 @@ export default function Hero() {
           </Suspense>
         </div>
       </div>
-      <a href="#About" className="scroll-cue" aria-label="Gulir ke bawah">
+      <a href="#About" className="scroll-cue" aria-label={t('hero.scroll')}>
         <span />
       </a>
     </section>

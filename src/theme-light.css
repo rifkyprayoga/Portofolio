@@ -1,0 +1,231 @@
+/* =========================================================
+   Tema terang. Aktif saat <html data-theme="light">.
+   Tema gelap tetap bawaan di index.css; file ini hanya menimpa
+   token warna dan bagian yang memakai warna gelap langsung.
+   Thumbnail proyek (mockup di atas gradasi) sengaja tetap gelap.
+   ========================================================= */
+
+:root[data-theme='light'] {
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --surface-2: #eef2f8;
+  --border: rgba(15, 23, 42, 0.1);
+  --border-strong: rgba(15, 23, 42, 0.2);
+  --text: #0b1220;
+  --text-2: #334155;
+  --muted: #5b6b82;
+  --accent: #2457d6;
+  --accent-2: #2563eb;
+  --cyan: #0e7490;
+  --glow: rgba(44, 103, 237, 0.22);
+  color-scheme: light;
+}
+
+:root[data-theme='light'] body {
+  background: var(--bg);
+}
+
+/* teks & gradasi judul */
+:root[data-theme='light'] .text-gradient {
+  background: linear-gradient(100deg, #0b1220 0%, var(--accent-2) 45%, var(--cyan) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+:root[data-theme='light'] .section-title {
+  background: linear-gradient(180deg, #0b1220 30%, rgba(51, 65, 85, 0.75));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+:root[data-theme='light'] .hero-title-rest,
+:root[data-theme='light'] .logo,
+:root[data-theme='light'] .logo-k {
+  color: var(--text);
+}
+:root[data-theme='light'] .logo-d {
+  color: #2f7fb5;
+}
+
+/* latar */
+:root[data-theme='light'] .ambient-orb {
+  opacity: 0.18;
+}
+:root[data-theme='light'] .orb-b,
+:root[data-theme='light'] .orb-c {
+  opacity: 0.12;
+}
+:root[data-theme='light'] .particles-canvas {
+  opacity: 0.55;
+}
+:root[data-theme='light'] .bg-grid {
+  background-image: linear-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+}
+:root[data-theme='light'] .meteors {
+  display: none;
+}
+
+/* kaca & kartu */
+:root[data-theme='light'] .glass {
+  background: rgba(255, 255, 255, 0.7);
+}
+:root[data-theme='light'] .glass-card {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.75));
+  box-shadow: 0 10px 30px -18px rgba(15, 23, 42, 0.25);
+}
+:root[data-theme='light'] .glass-card:hover {
+  border-color: rgba(37, 99, 235, 0.35);
+}
+:root[data-theme='light'] .metal-border,
+:root[data-theme='light'] .metal-border::before {
+  background: conic-gradient(
+    rgba(15, 23, 42, 0.1),
+    var(--accent-2),
+    rgba(15, 23, 42, 0.1) 30%,
+    rgba(15, 23, 42, 0.1) 60%,
+    var(--cyan),
+    rgba(15, 23, 42, 0.1)
+  );
+}
+:root[data-theme='light'] .glow-card {
+  background: radial-gradient(120% 140% at 0% 0%, rgba(44, 103, 237, 0.12), transparent 50%), rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.08), 0 30px 80px -40px var(--glow);
+}
+:root[data-theme='light'] .project-card-inner {
+  box-shadow: 0 14px 40px -24px rgba(15, 23, 42, 0.35);
+}
+
+/* tombol & kontrol */
+:root[data-theme='light'] .btn-secondary,
+:root[data-theme='light'] .social-btn,
+:root[data-theme='light'] .now-playing,
+:root[data-theme='light'] .music-btn,
+:root[data-theme='light'] .social-card,
+:root[data-theme='light'] .comment {
+  background: rgba(15, 23, 42, 0.035);
+}
+:root[data-theme='light'] .btn-secondary:hover,
+:root[data-theme='light'] .social-card:hover {
+  background: rgba(37, 99, 235, 0.08);
+}
+:root[data-theme='light'] .icon-btn:hover,
+:root[data-theme='light'] .music-btn:hover,
+:root[data-theme='light'] .track:hover {
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--text);
+}
+:root[data-theme='light'] .social-btn:hover,
+:root[data-theme='light'] .navbar-link:hover,
+:root[data-theme='light'] .navbar-link.is-active,
+:root[data-theme='light'] .mobile-link.is-active,
+:root[data-theme='light'] .tab-btn:hover,
+:root[data-theme='light'] .tab-btn.is-active,
+:root[data-theme='light'] .filter-chip:hover,
+:root[data-theme='light'] .filter-chip.is-active,
+:root[data-theme='light'] .footer-col a:hover {
+  color: var(--text);
+}
+:root[data-theme='light'] .music-btn.is-main {
+  color: #fff;
+}
+:root[data-theme='light'] .tab-btn.is-active {
+  background: linear-gradient(135deg, rgba(44, 103, 237, 0.18), rgba(96, 165, 250, 0.1));
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.3);
+}
+:root[data-theme='light'] .filter-chip {
+  background: rgba(255, 255, 255, 0.85);
+}
+:root[data-theme='light'] .filter-chip.is-active {
+  background: rgba(37, 99, 235, 0.12);
+  border-color: rgba(37, 99, 235, 0.45);
+}
+:root[data-theme='light'] .filter-count {
+  background: rgba(15, 23, 42, 0.07);
+}
+
+/* navbar */
+:root[data-theme='light'] .navbar.is-scrolled .navbar-inner {
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 20px 50px -25px rgba(15, 23, 42, 0.3);
+}
+:root[data-theme='light'] .mobile-menu {
+  background: rgba(15, 23, 42, 0.25);
+}
+
+/* loader & skeleton */
+:root[data-theme='light'] .welcome-track,
+:root[data-theme='light'] .cooldown {
+  background: rgba(15, 23, 42, 0.08);
+}
+:root[data-theme='light'] .skeleton {
+  background: linear-gradient(90deg, rgba(15, 23, 42, 0.05) 25%, rgba(15, 23, 42, 0.1) 50%, rgba(15, 23, 42, 0.05) 75%);
+  background-size: 200% 100%;
+}
+
+/* musik */
+:root[data-theme='light'] .track-thumb {
+  background: rgba(15, 23, 42, 0.06);
+}
+:root[data-theme='light'] .track.is-active {
+  background: rgba(37, 99, 235, 0.12);
+}
+:root[data-theme='light'] .music-dock {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 20px 50px -10px rgba(15, 23, 42, 0.3);
+}
+
+/* portfolio */
+:root[data-theme='light'] .cert-preview {
+  background: rgba(37, 99, 235, 0.06);
+}
+:root[data-theme='light'] .viewer {
+  background: rgba(15, 23, 42, 0.8);
+}
+
+/* form */
+:root[data-theme='light'] .field input,
+:root[data-theme='light'] .field textarea {
+  background: #fff;
+}
+:root[data-theme='light'] .field input::placeholder,
+:root[data-theme='light'] .field textarea::placeholder {
+  color: #94a3b8;
+}
+:root[data-theme='light'] .form-error {
+  color: #dc2626;
+}
+:root[data-theme='light'] .toast {
+  color: #15803d;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+/* detail proyek */
+:root[data-theme='light'] .detail-window {
+  box-shadow: 0 40px 80px -30px rgba(15, 23, 42, 0.35);
+}
+:root[data-theme='light'] .detail-preview-glow {
+  opacity: 0.5;
+}
+
+/* timeline & github */
+:root[data-theme='light'] .timeline::before {
+  background: linear-gradient(180deg, var(--accent-2), rgba(15, 23, 42, 0.12));
+}
+:root[data-theme='light'] .timeline-dot {
+  background: #fff;
+}
+:root[data-theme='light'] .timeline-item.is-current .timeline-dot {
+  background: var(--accent);
+}
+
+/* label di atas thumbnail (latar gelap) & mockup tetap memakai warna terang */
+:root[data-theme='light'] .project-cat {
+  color: #f8fafc;
+}
+:root[data-theme='light'] .thumb-desk-panel .is-label,
+:root[data-theme='light'] .thumb-caret {
+  color: #67e8f9;
+  background-color: transparent;
+}
+:root[data-theme='light'] .thumb-caret {
+  background: #67e8f9;
+}

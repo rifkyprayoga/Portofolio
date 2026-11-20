@@ -3,17 +3,20 @@ import { ArrowUpRight, Award, Code2, Cpu, Trophy, X } from 'lucide-react'
 import { awards, certificates, projects, techStack } from '../data/profile'
 import { useSound } from '../lib/sound'
 import ProjectThumb from './ProjectThumb'
+import { useLang } from '../lib/i18n'
 
 const tabs = [
-  { id: 'projects', label: 'Projects', icon: Code2 },
-  { id: 'certificates', label: 'Certificates', icon: Award },
-  { id: 'awards', label: 'Awards', icon: Trophy },
-  { id: 'stack', label: 'Tech Stack', icon: Cpu },
+  { id: 'projects', key: 'pf.tab.projects', icon: Code2 },
+  { id: 'certificates', key: 'pf.tab.certificates', icon: Award },
+  { id: 'awards', key: 'pf.tab.awards', icon: Trophy },
+  { id: 'stack', key: 'pf.tab.stack', icon: Cpu },
 ]
 
-const ALL = 'Semua'
-// urutan filter mengikuti urutan kemunculan kategori di data
-const filters = [ALL, ...new Set(projects.map((p) => p.category))]
+const ALL = '__all'
+// urutan filter mengikuti urutan kemunculan kategori di data (kategori dikenali dari teks ID-nya)
+const catKey = (c) => (typeof c === 'object' ? c.id : c)
+const filters = [ALL, ...new Set(projects.map((p) => catKey(p.category)))]
+const catOf = (key) => projects.find((p) => catKey(p.category) === key)?.category
 
 function SkillLogo({ skill }) {
   const [failed, setFailed] = useState(false)
@@ -31,17 +34,18 @@ function Empty({ icon: Icon, text }) {
 }
 
 function CertGrid({ items, onOpen, emptyText, icon }) {
+  const { t, tx } = useLang()
   if (!items.length) return <Empty icon={icon} text={emptyText} />
   return (
     <div className="cert-grid">
       {items.map((c) => (
-        <button key={c.title} className="cert-card glass-card" onClick={() => c.image && onOpen(c)}>
+        <button key={tx(c.title)} className="cert-card glass-card" onClick={() => c.image && onOpen(c)}>
           <div className="cert-preview">
-            {c.image ? <img src={c.image} alt={c.title} loading="lazy" /> : <Award size={36} />}
-            {c.image && <span className="cert-overlay">Lihat</span>}
+            {c.image ? <img src={c.image} alt={tx(c.title)} loading="lazy" /> : <Award size={36} />}
+            {c.image && <span className="cert-overlay">{t('pf.view')}</span>}
           </div>
           <div className="cert-body">
-            <h4>{c.title}</h4>
+            <h4>{tx(c.title)}</h4>
             <p className="mono">
               {c.issuer} · {c.year}
             </p>
@@ -53,10 +57,11 @@ function CertGrid({ items, onOpen, emptyText, icon }) {
 }
 
 export default function Portfolio({ onOpenProject }) {
+  const { t, tx } = useLang()
   const [tab, setTab] = useState('projects')
   const [filter, setFilter] = useState(ALL)
   const [viewer, setViewer] = useState(null)
-  const shown = filter === ALL ? projects : projects.filter((p) => p.category === filter)
+  const shown = filter === ALL ? projects : projects.filter((p) => catKey(p.category) === filter)
   const { play } = useSound()
 
   useEffect(() => {
@@ -74,33 +79,33 @@ export default function Portfolio({ onOpenProject }) {
     <section className="section portfolio" id="Portofolio" aria-labelledby="portfolio-heading">
       <div className="container">
         <h2 className="section-title" id="portfolio-heading" data-reveal>
-          Portfolio
+          {t('pf.title')}
         </h2>
         <p className="section-sub" data-reveal>
-          Projek, sertifikat, pencapaian, dan teknologi yang saya pakai.
+          {t('pf.sub')}
         </p>
 
         <div className="tab-bar glass" role="tablist" data-reveal>
-          {tabs.map((t) => (
+          {tabs.map((tb) => (
             <button
-              key={t.id}
+              key={tb.id}
               role="tab"
-              aria-selected={tab === t.id}
-              className={`tab-btn ${tab === t.id ? 'is-active' : ''}`}
+              aria-selected={tab === tb.id}
+              className={`tab-btn ${tab === tb.id ? 'is-active' : ''}`}
               onClick={() => {
-                setTab(t.id)
+                setTab(tb.id)
                 play('click')
               }}
             >
-              <t.icon size={16} />
-              <span>{t.label}</span>
+              <tb.icon size={16} />
+              <span>{t(tb.key)}</span>
             </button>
           ))}
         </div>
 
         <div className="tab-panel" key={tab}>
           {tab === 'projects' && (
-            <div className="filter-row" role="group" aria-label="Filter kategori projek">
+            <div className="filter-row" role="group" aria-label={t('pf.filter')}>
               {filters.map((f) => (
                 <button
                   key={f}
@@ -111,9 +116,9 @@ export default function Portfolio({ onOpenProject }) {
                     play('click')
                   }}
                 >
-                  {f}
+                  {f === ALL ? t('pf.all') : tx(catOf(f))}
                   <span className="filter-count mono">
-                    {f === ALL ? projects.length : projects.filter((p) => p.category === f).length}
+                    {f === ALL ? projects.length : projects.filter((p) => catKey(p.category) === f).length}
                   </span>
                 </button>
               ))}
@@ -126,16 +131,16 @@ export default function Portfolio({ onOpenProject }) {
                   <div className="project-card-inner">
                     <div className="project-thumb">
                       <ProjectThumb project={p} />
-                      <span className="project-cat mono">{p.category}</span>
-                      {p.badge && <span className="project-badge mono">{p.badge}</span>}
+                      <span className="project-cat mono">{tx(p.category)}</span>
+                      {p.badge && <span className="project-badge mono">{tx(p.badge)}</span>}
                     </div>
                     <div className="project-body">
                       <div className="project-meta mono">
                         {p.year && <span>{p.year}</span>}
-                        {p.role && <span>{p.role}</span>}
+                        {p.role && <span>{tx(p.role)}</span>}
                       </div>
-                      <h3>{p.title}</h3>
-                      <p>{p.description}</p>
+                      <h3>{tx(p.title)}</h3>
+                      <p>{tx(p.description)}</p>
                       <div className="chip-row">
                         {p.tags.slice(0, 4).map((t) => (
                           <span key={t} className="chip">
@@ -150,7 +155,7 @@ export default function Portfolio({ onOpenProject }) {
                           onOpenProject(p.id)
                         }}
                       >
-                        Detail <ArrowUpRight size={15} />
+                        {t('pf.detail')} <ArrowUpRight size={15} />
                       </button>
                     </div>
                   </div>
@@ -160,20 +165,20 @@ export default function Portfolio({ onOpenProject }) {
           )}
 
           {tab === 'certificates' && (
-            <CertGrid items={certificates} onOpen={setViewer} icon={Award} emptyText="Sertifikat segera ditambahkan." />
+            <CertGrid items={certificates} onOpen={setViewer} icon={Award} emptyText={t('pf.certEmpty')} />
           )}
           {tab === 'awards' && (
-            <CertGrid items={awards} onOpen={setViewer} icon={Trophy} emptyText="Pencapaian segera ditambahkan." />
+            <CertGrid items={awards} onOpen={setViewer} icon={Trophy} emptyText={t('pf.awardEmpty')} />
           )}
 
           {tab === 'stack' && (
             <div className="stack-groups">
               {techStack.map((g) => (
-                <div key={g.category} className="stack-group">
-                  <h4 className="mono">{g.category}</h4>
+                <div key={catKey(g.category)} className="stack-group">
+                  <h4 className="mono">{tx(g.category)}</h4>
                   <div className="skill-grid">
                     {g.skills.map((s) => (
-                      <div key={g.category + s.name} className="skill-card glass-card" onMouseEnter={() => play('hover')}>
+                      <div key={catKey(g.category) + s.name} className="skill-card glass-card" onMouseEnter={() => play('hover')}>
                         <SkillLogo skill={s} />
                         <span>{s.name}</span>
                       </div>
@@ -187,11 +192,11 @@ export default function Portfolio({ onOpenProject }) {
       </div>
 
       {viewer && (
-        <div className="viewer" role="dialog" aria-modal="true" aria-label={viewer.title} onClick={() => setViewer(null)}>
-          <button className="viewer-close icon-btn" aria-label="Tutup" onClick={() => setViewer(null)}>
+        <div className="viewer" role="dialog" aria-modal="true" aria-label={tx(viewer.title)} onClick={() => setViewer(null)}>
+          <button className="viewer-close icon-btn" aria-label={t('pf.close')} onClick={() => setViewer(null)}>
             <X size={20} />
           </button>
-          <img src={viewer.image} alt={viewer.title} onClick={(e) => e.stopPropagation()} />
+          <img src={viewer.image} alt={tx(viewer.title)} onClick={(e) => e.stopPropagation()} />
         </div>
       )}
     </section>

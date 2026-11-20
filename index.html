@@ -9,7 +9,13 @@
     <meta property="og:title" content="Rifky Deby Prayoga | Portofolio" />
     <meta property="og:description" content="Mobile Developer — membangun aplikasi yang cepat, rapi, dan enak dipakai." />
     <meta property="og:type" content="website" />
-    <style>html,body,#root{background-color:#050510;min-height:100%;margin:0}</style>
+    <script>
+      // pasang tema tersimpan sebelum halaman digambar (mencegah kedipan tema)
+      try {
+        if (localStorage.getItem('theme') === 'light') document.documentElement.dataset.theme = 'light'
+      } catch (e) {}
+    </script>
+    <style>html,body,#root{background-color:#050510;min-height:100%;margin:0}html[data-theme=light],html[data-theme=light] body,html[data-theme=light] #root{background-color:#f5f7fb}</style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

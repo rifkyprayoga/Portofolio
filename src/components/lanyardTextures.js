@@ -267,7 +267,7 @@ export function drawCardBack(canvas) {
   ctx.fillStyle = 'rgba(22, 28, 54, 0.88)'
   const left = 96
   const colW = 600
-  const words = profile.tagline.split(' ')
+  const words = (profile.tagline.id ?? profile.tagline).split(' ')
   let line = ''
   let lines = 0
   for (const word of words) {

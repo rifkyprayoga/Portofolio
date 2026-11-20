@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Pause, Play, SkipBack, SkipForward, X } from 'lucide-react'
 import { music as cfg } from '../data/profile'
 import { useSound } from './sound'
+import { useLang } from './i18n'
 
 // =========================================================
 // Musik latar
@@ -49,6 +50,7 @@ async function fetchTrackInfo(id) {
 
 export function MusicProvider({ active, children }) {
   const { soundEnabled } = useSound()
+  const { t } = useLang()
   const [phase, setPhase] = useState('intro') // 'intro' | 'playlist'
   const [status, setStatus] = useState('idle') // idle | waiting | playing | paused
   const [index, setIndex] = useState(0)
@@ -362,7 +364,7 @@ export function MusicProvider({ active, children }) {
   const current =
     phase === 'intro'
       ? null
-      : { title: track?.title || `Lagu ${index + 1}`, subtitle: track?.author || `Playlist ${cfg.playlistName}` }
+      : { title: track?.title || t('music.track', { n: index + 1 }), subtitle: track?.author || `Playlist ${cfg.playlistName}` }
 
   const value = {
     phase,
@@ -392,23 +394,23 @@ export function MusicProvider({ active, children }) {
   )
 
   const dock = showDock && (
-    <div className="music-dock" role="region" aria-label="Pemutar musik" data-music-control>
+    <div className="music-dock" role="region" aria-label={t('music.player')} data-music-control>
       <div className={`eq ${status === 'playing' ? 'is-playing' : ''}`} aria-hidden="true">
         <span />
         <span />
         <span />
       </div>
       <div className="music-dock-info">
-        <strong>{current?.title ?? 'Musik latar'}</strong>
+        <strong>{current?.title ?? t('music.bg')}</strong>
         <span>{current?.subtitle ?? `Playlist ${cfg.playlistName}`}</span>
       </div>
-      <button className="music-btn" onClick={prev} aria-label="Lagu sebelumnya">
+      <button className="music-btn" onClick={prev} aria-label={t('music.prev')}>
         <SkipBack size={14} />
       </button>
-      <button className="music-btn is-main" onClick={toggle} aria-label={status === 'playing' ? 'Jeda' : 'Putar'}>
+      <button className="music-btn is-main" onClick={toggle} aria-label={status === 'playing' ? t('music.pause') : t('music.play')}>
         {status === 'playing' ? <Pause size={15} /> : <Play size={15} />}
       </button>
-      <button className="music-btn" onClick={next} aria-label="Lagu berikutnya">
+      <button className="music-btn" onClick={next} aria-label={t('music.next')}>
         <SkipForward size={14} />
       </button>
       <button
@@ -417,7 +419,7 @@ export function MusicProvider({ active, children }) {
           pause()
           setDockClosed(true)
         }}
-        aria-label="Tutup pemutar"
+        aria-label={t('music.closePlayer')}
       >
         <X size={14} />
       </button>

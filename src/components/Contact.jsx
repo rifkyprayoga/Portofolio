@@ -1,22 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowUpRight, CheckCircle2, ImagePlus, Loader2, MessageSquare, Send, UserRound, X } from 'lucide-react'
 import { profile, socials } from '../data/profile'
-import { AVATAR_BUCKET, supabase } from '../lib/supabase'
+import { AVATAR_BUCKET, getSupabase } from '../lib/supabase'
 import { useSound } from '../lib/sound'
+import { useLang } from '../lib/i18n'
 import BrandIcon from './BrandIcon'
 
 const PAGE = 6
 const COOLDOWN = 60 // detik antar komentar
 const MAX_FILE = 5 * 1024 * 1024
-const NOT_CONFIGURED = 'Supabase belum dikonfigurasi (isi .env).'
-
-function timeAgo(iso) {
+function timeAgo(iso, t, lang) {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
-  if (s < 60) return 'baru saja'
-  if (s < 3600) return `${Math.floor(s / 60)} menit lalu`
-  if (s < 86400) return `${Math.floor(s / 3600)} jam lalu`
-  if (s < 2592000) return `${Math.floor(s / 86400)} hari lalu`
-  return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+  if (s < 60) return t('time.now')
+  if (s < 3600) return t('time.min', { n: Math.floor(s / 60) })
+  if (s < 86400) return t('time.hour', { n: Math.floor(s / 3600) })
+  if (s < 2592000) return t('time.day', { n: Math.floor(s / 86400) })
+  return new Date(iso).toLocaleDateString(lang === 'en' ? 'en-US' : 'id-ID', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 function readCooldownEnd() {
@@ -29,13 +32,15 @@ function readCooldownEnd() {
 
 function ContactForm() {
   const { play } = useSound()
+  const { t } = useLang()
   const [form, setForm] = useState({ name: '', email: '', message: '', website: '' })
   const [status, setStatus] = useState({ state: 'idle', msg: '' })
 
   const submit = async (e) => {
     e.preventDefault()
     if (form.website) return // honeypot: bot
-    if (!supabase) return setStatus({ state: 'error', msg: NOT_CONFIGURED })
+    const supabase = await getSupabase()
+    if (!supabase) return setStatus({ state: 'error', msg: t('contact.notConfigured') })
     setStatus({ state: 'loading', msg: '' })
     const { error } = await supabase.from('contact_messages').insert({
       name: form.name.trim(),
@@ -43,12 +48,12 @@ function ContactForm() {
       message: form.message.trim(),
     })
     if (error) {
-      setStatus({ state: 'error', msg: 'Gagal mengirim pesan. Coba lagi sebentar.' })
+      setStatus({ state: 'error', msg: t('contact.failed') })
       return
     }
     play('success')
     setForm({ name: '', email: '', message: '', website: '' })
-    setStatus({ state: 'success', msg: 'Pesan berhasil dikirim. Terima kasih!' })
+    setStatus({ state: 'success', msg: t('contact.sent') })
     setTimeout(() => setStatus({ state: 'idle', msg: '' }), 5000)
   }
 
@@ -57,29 +62,29 @@ function ContactForm() {
   return (
     <form className="contact-form" onSubmit={submit}>
       <label className="field">
-        <span>Nama</span>
-        <input required maxLength={100} value={form.name} onChange={set('name')} placeholder="Nama kamu" autoComplete="name" />
+        <span>{t('contact.name')}</span>
+        <input required maxLength={100} value={form.name} onChange={set('name')} placeholder={t('contact.namePh')} autoComplete="name" />
       </label>
       <label className="field">
-        <span>Email</span>
+        <span>{t('contact.email')}</span>
         <input
           required
           type="email"
           maxLength={200}
           value={form.email}
           onChange={set('email')}
-          placeholder="kamu@email.com"
+          placeholder={t('contact.emailPh')}
           autoComplete="email"
         />
       </label>
       <label className="field">
-        <span>Pesan</span>
-        <textarea required maxLength={3000} rows={5} value={form.message} onChange={set('message')} placeholder="Ceritakan idemu..." />
+        <span>{t('contact.message')}</span>
+        <textarea required maxLength={3000} rows={5} value={form.message} onChange={set('message')} placeholder={t('contact.messagePh')} />
       </label>
       <input className="hp" tabIndex={-1} autoComplete="off" value={form.website} onChange={set('website')} aria-hidden="true" />
       <button className="btn-primary btn-block" disabled={status.state === 'loading'}>
         {status.state === 'loading' ? <Loader2 size={16} className="spin" /> : <Send size={16} />}
-        {status.state === 'loading' ? 'Mengirim...' : 'Kirim Pesan'}
+        {status.state === 'loading' ? t('contact.sending') : t('contact.send')}
       </button>
       {status.state === 'error' && <p className="form-error">{status.msg}</p>}
       {status.state === 'success' && (
@@ -93,6 +98,7 @@ function ContactForm() {
 
 function Comments() {
   const { play } = useSound()
+  const { t, lang } = useLang()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
@@ -117,9 +123,10 @@ function Comments() {
   }, [remaining])
 
   const load = useCallback(async (offset = 0) => {
+    const supabase = await getSupabase()
     if (!supabase) {
       setLoading(false)
-      setLoadError(NOT_CONFIGURED)
+      setLoadError('contact.notConfigured')
       return
     }
     setLoading(true)
@@ -131,7 +138,7 @@ function Comments() {
       .range(offset, offset + PAGE)
     setLoading(false)
     if (error) {
-      setLoadError('Komentar gagal dimuat.')
+      setLoadError('gb.loadFailed')
       return
     }
     setHasMore(data.length > PAGE)
@@ -149,8 +156,8 @@ function Comments() {
     const f = e.target.files?.[0]
     setError('')
     if (!f) return
-    if (!f.type.startsWith('image/')) return setError('File harus berupa gambar.')
-    if (f.size > MAX_FILE) return setError('Ukuran file maksimal 5 MB.')
+    if (!f.type.startsWith('image/')) return setError(t('gb.notImage'))
+    if (f.size > MAX_FILE) return setError(t('gb.tooBig'))
     setFile(f)
     setPreview(URL.createObjectURL(f))
   }
@@ -163,7 +170,8 @@ function Comments() {
 
   const submit = async (e) => {
     e.preventDefault()
-    if (!supabase) return setError(NOT_CONFIGURED)
+    const supabase = await getSupabase()
+    if (!supabase) return setError(t('contact.notConfigured'))
     if (remaining) return
     setSending(true)
     setError('')
@@ -174,7 +182,7 @@ function Comments() {
       const up = await supabase.storage.from(AVATAR_BUCKET).upload(path, file, { contentType: file.type })
       if (up.error) {
         setSending(false)
-        return setError('Foto gagal diunggah.')
+        return setError(t('gb.uploadFailed'))
       }
       avatar_url = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(path).data.publicUrl
     }
@@ -183,9 +191,9 @@ function Comments() {
       .from('comments')
       .insert({ name: name.trim(), message: message.trim(), avatar_url, approved: false })
     setSending(false)
-    if (error) return setError('Komentar gagal dikirim. Coba lagi.')
+    if (error) return setError(t('gb.sendFailed'))
     play('success')
-    setNotice('Terima kasih! Komentarmu akan tampil setelah disetujui.')
+    setNotice(t('gb.thanks'))
     setTimeout(() => setNotice(''), 6000)
     setName('')
     setMessage('')
@@ -207,46 +215,46 @@ function Comments() {
           <MessageSquare size={18} />
         </span>
         <div>
-          <h3>Buku Tamu</h3>
-          <p>Tinggalkan jejak, saran, atau sekadar sapaan.</p>
+          <h3>{t('gb.title')}</h3>
+          <p>{t('gb.sub')}</p>
         </div>
       </div>
 
       <form className="comment-form" onSubmit={submit}>
         <label className="field">
-          <span>Nama</span>
-          <input required maxLength={60} value={name} onChange={(e) => setName(e.target.value)} placeholder="Nama kamu" />
+          <span>{t('contact.name')}</span>
+          <input required maxLength={60} value={name} onChange={(e) => setName(e.target.value)} placeholder={t('contact.namePh')} />
         </label>
         <label className="field">
-          <span>Komentar</span>
+          <span>{t('gb.comment')}</span>
           <textarea
             required
             maxLength={500}
             rows={3}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Tulis komentar..."
+            placeholder={t('gb.commentPh')}
           />
         </label>
         <div className="photo-picker">
           {preview ? (
             <div className="photo-preview">
-              <img src={preview} alt="Pratinjau foto" />
-              <button type="button" onClick={clearFile} aria-label="Hapus foto">
+              <img src={preview} alt={t('gb.photoPreview')} />
+              <button type="button" onClick={clearFile} aria-label={t('gb.photoRemove')}>
                 <X size={12} />
               </button>
             </div>
           ) : (
             <button type="button" className="photo-btn" onClick={() => fileRef.current?.click()}>
-              <ImagePlus size={16} /> Foto Profil (opsional)
+              <ImagePlus size={16} /> {t('gb.photo')}
             </button>
           )}
-          <span className="photo-hint">Ukuran file maksimal 5 MB</span>
+          <span className="photo-hint">{t('gb.photoHint')}</span>
           <input ref={fileRef} type="file" accept="image/*" hidden onChange={pickFile} />
         </div>
         <button className="btn-primary btn-block" disabled={sending || remaining > 0}>
           {sending ? <Loader2 size={16} className="spin" /> : <Send size={16} />}
-          {sending ? 'Mengirim...' : remaining ? `Tunggu ${remaining} detik` : 'Kirim Komentar'}
+          {sending ? t('contact.sending') : remaining ? t('gb.wait', { n: remaining }) : t('gb.submit')}
         </button>
         {remaining > 0 && (
           <div className="cooldown">
@@ -270,7 +278,7 @@ function Comments() {
             <div className="comment-content">
               <div className="comment-meta">
                 <strong>{c.name}</strong>
-                <span>{timeAgo(c.created_at)}</span>
+                <span>{timeAgo(c.created_at, t, lang)}</span>
               </div>
               <p>{c.message}</p>
             </div>
@@ -286,13 +294,13 @@ function Comments() {
               </div>
             </div>
           ))}
-        {!loading && loadError && <p className="comments-empty">{loadError}</p>}
+        {!loading && loadError && <p className="comments-empty">{t(loadError)}</p>}
         {!loading && !loadError && items.length === 0 && (
-          <p className="comments-empty">Belum ada komentar. Jadilah yang pertama!</p>
+          <p className="comments-empty">{t('gb.empty')}</p>
         )}
         {!loading && hasMore && (
           <button className="btn-secondary btn-block" onClick={() => load(items.length)}>
-            Muat lebih banyak
+            {t('gb.more')}
           </button>
         )}
       </div>
@@ -302,6 +310,7 @@ function Comments() {
 
 export default function Contact() {
   const { play } = useSound()
+  const { t } = useLang()
   const cards = [
     ...socials,
     ...(profile.email ? [{ id: 'email', label: 'Email', handle: profile.email, url: `mailto:${profile.email}` }] : []),
@@ -310,20 +319,20 @@ export default function Contact() {
     <section className="section contact" id="Contact" aria-labelledby="contact-heading">
       <div className="container">
         <h2 className="section-title" id="contact-heading" data-reveal>
-          Hubungi Saya
+          {t('contact.title')}
         </h2>
         <p className="section-sub" data-reveal>
-          Ada ide aplikasi atau mau ngobrol soal proyek? Kirim pesan aja, saya balas secepatnya.
+          {t('contact.sub')}
         </p>
 
         <div className="contact-grid">
           <div className="contact-left">
             <div className="panel glass-card" data-reveal>
-              <h3 className="panel-title">Kirim Pesan</h3>
+              <h3 className="panel-title">{t('contact.send')}</h3>
               <ContactForm />
             </div>
             <div className="panel glass-card" data-reveal>
-              <h3 className="panel-title">Temukan saya di</h3>
+              <h3 className="panel-title">{t('contact.findMe')}</h3>
               <div className="social-grid">
                 {cards.map((s) => (
                   <a

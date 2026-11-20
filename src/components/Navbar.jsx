@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
-import { Menu, Music, X } from 'lucide-react'
+import { Menu, Moon, Music, Sun, X } from 'lucide-react'
 import { useSound } from '../lib/sound'
 import { useMusic } from '../lib/music'
 import Logo from './Logo'
+import { useLang } from '../lib/i18n'
+import { useTheme } from '../lib/theme'
 
 const links = [
-  { name: 'Home', id: 'Home' },
-  { name: 'About', id: 'About' },
-  { name: 'Portfolio', id: 'Portofolio' },
-  { name: 'Contact', id: 'Contact' },
+  { key: 'nav.home', id: 'Home' },
+  { key: 'nav.about', id: 'About' },
+  { key: 'nav.portfolio', id: 'Portofolio' },
+  { key: 'nav.contact', id: 'Contact' },
 ]
 
 export default function Navbar() {
@@ -20,6 +22,8 @@ export default function Navbar() {
   const { play } = useSound()
   const music = useMusic()
   const musicOn = music.status === 'playing'
+  const { t, lang, toggleLang } = useLang()
+  const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
     const onScroll = () => {
@@ -61,8 +65,8 @@ export default function Navbar() {
 
   return (
     <header className={`navbar ${scrolled ? 'is-scrolled' : ''}`}>
-      <nav className="navbar-inner glass" aria-label="Navigasi utama">
-        <a href="#Home" className="navbar-brand" onClick={go('Home')} aria-label="KYDEP — kembali ke beranda">
+      <nav className="navbar-inner glass" aria-label={t('nav.main')}>
+        <a href="#Home" className="navbar-brand" onClick={go('Home')} aria-label={t('nav.brand')}>
           <Logo />
         </a>
 
@@ -77,18 +81,40 @@ export default function Navbar() {
               onClick={go(l.id)}
               onMouseEnter={() => play('hover')}
             >
-              {l.name}
+              {t(l.key)}
             </a>
           ))}
         </div>
 
         <div className="navbar-actions">
           <button
+            className="icon-btn lang-toggle mono"
+            onClick={() => {
+              play('click')
+              toggleLang()
+            }}
+            aria-label={t('nav.lang')}
+            title={t('nav.lang')}
+          >
+            {lang === 'id' ? 'EN' : 'ID'}
+          </button>
+          <button
+            className="icon-btn theme-toggle"
+            onClick={() => {
+              play('click')
+              toggleTheme()
+            }}
+            aria-label={theme === 'dark' ? t('nav.toLight') : t('nav.toDark')}
+            title={theme === 'dark' ? t('nav.toLight') : t('nav.toDark')}
+          >
+            {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+          </button>
+          <button
             data-music-control
             className={`icon-btn music-toggle ${music.status === 'waiting' ? 'is-waiting' : ''}`}
             onClick={music.toggle}
-            aria-label={musicOn ? 'Jeda musik' : 'Putar musik'}
-            title={musicOn ? `Sedang diputar: ${music.nowPlaying?.title ?? 'musik latar'}` : 'Putar musik'}
+            aria-label={musicOn ? t('nav.musicPause') : t('nav.musicPlay')}
+            title={musicOn ? t('nav.musicNow', { title: music.nowPlaying?.title ?? t('nav.bgMusic') }) : t('nav.musicPlay')}
           >
             {musicOn ? (
               <span className="eq is-playing" aria-hidden="true">
@@ -100,7 +126,7 @@ export default function Navbar() {
               <Music size={17} />
             )}
           </button>
-          <button className="icon-btn navbar-toggle" onClick={() => setOpen((v) => !v)} aria-label="Menu" aria-expanded={open}>
+          <button className="icon-btn navbar-toggle" onClick={() => setOpen((v) => !v)} aria-label={t('nav.menu')} aria-expanded={open}>
             {open ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
@@ -117,11 +143,11 @@ export default function Navbar() {
               onClick={go(l.id)}
             >
               <span className="mobile-link-index">0{i + 1}</span>
-              {l.name}
+              {t(l.key)}
             </a>
           ))}
           <a href="#Contact" className="btn-primary mobile-cta" onClick={go('Contact')}>
-            Hubungi Saya
+            {t('nav.cta')}
           </a>
         </div>
       </div>

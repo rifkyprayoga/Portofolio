@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { awards, certificates, profile, projects } from '../data/profile'
 import { useMusic } from '../lib/music'
 import Logo from './Logo'
+import { useLang } from '../lib/i18n'
 
 // Loader pembuka: web baru dibuka setelah aset utama benar-benar terunduh & siap,
 // supaya tidak ada unduhan / inisialisasi berat yang terjadi saat web sudah tampil.
@@ -32,8 +33,9 @@ const loadImage = (src) =>
 
 export default function WelcomeScreen({ onDone }) {
   const music = useMusic()
+  const { t } = useLang()
   const [progress, setProgress] = useState(0)
-  const [label, setLabel] = useState('Memuat font')
+  const [label, setLabel] = useState('load.fonts')
   const [leaving, setLeaving] = useState(false)
 
   // kesiapan player musik datang dari context → jembatani ke Promise
@@ -43,8 +45,10 @@ export default function WelcomeScreen({ onDone }) {
     return { p, resolve }
   })
   useEffect(() => {
-    if (music.loaded.intro && music.loaded.playlist) musicReady.resolve()
-  }, [music.loaded.intro, music.loaded.playlist, musicReady])
+    // cukup tunggu lagu pembuka; player YouTube (playlist) disiapkan di latar
+    // karena baru dipakai setelah lagu pembuka selesai
+    if (music.loaded.intro) musicReady.resolve()
+  }, [music.loaded.intro, musicReady])
 
   useEffect(() => {
     const images = [
@@ -58,10 +62,10 @@ export default function WelcomeScreen({ onDone }) {
     ].filter(Boolean)
 
     const tasks = [
-      { label: 'Memuat font', weight: 1, run: () => Promise.all(FONTS.map((f) => document.fonts.load(f))), ms: 6000 },
-      { label: 'Memuat gambar', weight: 3, run: () => Promise.all(images.map(loadImage)), ms: 12000 },
-      { label: 'Menyiapkan kartu 3D', weight: 3, run: () => import('./Lanyard'), ms: 12000 },
-      { label: 'Menyiapkan musik', weight: 2, run: () => musicReady.p, ms: 9000 },
+      { label: 'load.fonts', weight: 1, run: () => Promise.all(FONTS.map((f) => document.fonts.load(f))), ms: 6000 },
+      { label: 'load.images', weight: 3, run: () => Promise.all(images.map(loadImage)), ms: 12000 },
+      { label: 'load.card', weight: 3, run: () => import('./Lanyard'), ms: 12000 },
+      { label: 'load.music', weight: 2, run: () => musicReady.p, ms: 9000 },
     ]
     const total = tasks.reduce((s, t) => s + t.weight, 0)
     let done = 0
@@ -93,7 +97,7 @@ export default function WelcomeScreen({ onDone }) {
       if (value < 100) {
         raf = requestAnimationFrame(tick)
       } else {
-        setLabel('Siap')
+        setLabel('load.ready')
         setLeaving(true)
         setTimeout(onDone, 650)
       }
@@ -116,7 +120,7 @@ export default function WelcomeScreen({ onDone }) {
         <div className="welcome-track">
           <div className="welcome-bar" style={{ transform: `scaleX(${progress / 100})` }} />
         </div>
-        <p className="welcome-label">{label}...</p>
+        <p className="welcome-label">{t(label)}...</p>
       </div>
     </div>
   )

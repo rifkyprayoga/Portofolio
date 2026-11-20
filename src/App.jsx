@@ -14,6 +14,8 @@ import Portfolio from './components/Portfolio'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import ProjectDetail from './components/ProjectDetail'
+import GitHubStats from './components/GitHubStats'
+import { useLang } from './lib/i18n'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -56,6 +58,7 @@ function Home({ onOpenProject }) {
       <About />
       <Soundtrack />
       <Portfolio onOpenProject={onOpenProject} />
+      <GitHubStats />
       <Contact />
     </>
   )
@@ -65,6 +68,7 @@ export default function App() {
   const [ready, setReady] = useState(false)
   const [path, setPath] = useState(window.location.pathname)
   const projectId = projectIdFrom(path)
+  const { t } = useLang()
 
   useEffect(() => {
     const onPop = () => setPath(window.location.pathname)
@@ -73,8 +77,8 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (!projectId) document.title = `${profile.name} | Portofolio`
-  }, [projectId])
+    if (!projectId) document.title = `${profile.name} | ${t('pf.title')}`
+  }, [projectId, t])
 
   // setelah loader selesai, lompat ke #hash bila ada (mis. /#Portofolio)
   useEffect(() => {

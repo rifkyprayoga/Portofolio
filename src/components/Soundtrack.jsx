@@ -1,9 +1,11 @@
 import { ArrowUpRight, Music, Pause, Play, SkipBack, SkipForward } from 'lucide-react'
 import { useMusic } from '../lib/music'
+import { useLang } from '../lib/i18n'
 
 // Section musik: info lagu, kontrol, dan daftar lagu playlist (audio saja)
 export default function Soundtrack() {
   const m = useMusic()
+  const { t } = useLang()
   // lagu pembuka berjalan diam-diam: kartu "sedang diputar" baru terisi saat playlist diputar
   const inPlaylist = m.phase === 'playlist'
   const playing = inPlaylist && m.status === 'playing'
@@ -11,15 +13,15 @@ export default function Soundtrack() {
   const onMain = inPlaylist ? m.toggle : () => m.playTrack(0)
 
   return (
-    <section className="section soundtrack" aria-label="Soundtrack" ref={m.registerSection}>
+    <section className="section soundtrack" aria-label={t('music.section')} ref={m.registerSection}>
       <div className="container">
         <div className="soundtrack-card glow-card" data-reveal data-music-control>
           <div className="soundtrack-copy">
             <span className="eyebrow">
-              <Music size={14} /> {playing ? 'Sedang diputar' : 'Soundtrack'}
+              <Music size={14} /> {playing ? t('music.nowPlaying') : t('music.section')}
             </span>
-            <h3>Soundtrack ngoding</h3>
-            <p>Lagu-lagu yang menemani saya debugging sampai larut malam. Siapa tahu cocok juga buat kamu.</p>
+            <h3>{t('music.title')}</h3>
+            <p>{t('music.desc')}</p>
 
             <div className={`now-playing ${m.nowPlaying ? '' : 'is-empty'}`}>
               <div className={`eq ${playing ? 'is-playing' : ''}`} aria-hidden="true">
@@ -28,57 +30,57 @@ export default function Soundtrack() {
                 <span />
               </div>
               <div className="now-playing-info">
-                <strong>{m.nowPlaying?.title ?? 'Belum ada lagu diputar'}</strong>
+                <strong>{m.nowPlaying?.title ?? t('music.nothing')}</strong>
                 <span>
                   {m.status === 'error'
-                    ? `YouTube menolak memutar lagu (kode ${m.errorCode})`
+                    ? t('music.blockedCode', { code: m.errorCode })
                     : loading
-                      ? 'Memuat lagu…'
-                      : (m.nowPlaying?.subtitle ?? 'Tekan play atau pilih lagu dari playlist')}
+                      ? t('music.loading')
+                      : (m.nowPlaying?.subtitle ?? t('music.hint'))}
                 </span>
               </div>
               <div className="now-playing-controls">
-                <button className="music-btn" onClick={m.prev} disabled={!inPlaylist} aria-label="Lagu sebelumnya">
+                <button className="music-btn" onClick={m.prev} disabled={!inPlaylist} aria-label={t('music.prev')}>
                   <SkipBack size={16} />
                 </button>
-                <button className="music-btn is-main" onClick={onMain} aria-label={playing ? 'Jeda' : 'Putar'}>
+                <button className="music-btn is-main" onClick={onMain} aria-label={playing ? t('music.pause') : t('music.play')}>
                   {playing ? <Pause size={18} /> : <Play size={18} />}
                 </button>
-                <button className="music-btn" onClick={m.next} aria-label="Lagu berikutnya">
+                <button className="music-btn" onClick={m.next} aria-label={t('music.next')}>
                   <SkipForward size={16} />
                 </button>
               </div>
             </div>
             <a href={m.playlistUrl} target="_blank" rel="noreferrer" className="link-arrow">
-              Buka di YouTube Music <ArrowUpRight size={15} />
+              {t('music.open')} <ArrowUpRight size={15} />
             </a>
           </div>
 
-          <ol className="track-list" aria-label="Daftar lagu playlist">
+          <ol className="track-list" aria-label={t('music.list')}>
             {m.tracks.length === 0 &&
               Array.from({ length: 5 }, (_, i) => (
                 <li key={i} className="skeleton track-skeleton" aria-hidden="true" />
               ))}
-            {m.tracks.map((t, i) => {
+            {m.tracks.map((tr, i) => {
               const isCurrent = inPlaylist && m.index === i
               return (
-              <li key={t.id}>
+              <li key={tr.id}>
                 <button
-                  className={`track ${isCurrent ? 'is-active' : ''} ${t.blocked ? 'is-blocked' : ''}`}
+                  className={`track ${isCurrent ? 'is-active' : ''} ${tr.blocked ? 'is-blocked' : ''}`}
                   onClick={() => m.playTrack(i)}
-                  disabled={t.blocked}
+                  disabled={tr.blocked}
                   aria-current={isCurrent ? 'true' : undefined}
                 >
                   <span className="track-no mono">{String(i + 1).padStart(2, '0')}</span>
-                  <img className="track-thumb" src={`https://i.ytimg.com/vi/${t.id}/default.jpg`} alt="" loading="lazy" />
+                  <img className="track-thumb" src={`https://i.ytimg.com/vi/${tr.id}/default.jpg`} alt="" loading="lazy" />
                   <span className="track-text">
-                    <strong>{t.title || `Lagu ${i + 1}`}</strong>
+                    <strong>{tr.title || t('music.track', { n: i + 1 })}</strong>
                     <span>
-                      {t.blocked
-                        ? 'Tidak bisa diputar di luar YouTube'
+                      {tr.blocked
+                        ? t('music.blocked')
                         : isCurrent && loading
-                          ? 'Memuat lagu…'
-                          : t.author || '…'}
+                          ? t('music.loading')
+                          : tr.author || '…'}
                     </span>
                   </span>
                 </button>
