@@ -208,7 +208,7 @@ export function drawCardBack(canvas) {
   paper(ctx, w, h)
   slotPill(ctx, w)
 
-  // label atas kiri + garis penghubung (seperti "SENIOR" di depan)
+  // label atas kiri + garis penghubung (seperti "JUNIOR" di depan)
   const top = 150
   const box = labelBox(ctx, 'ABOUT ME', 96, top, 50)
   ctx.strokeStyle = NAVY
@@ -396,8 +396,8 @@ export function drawStrap(canvas) {
   ctx.fillStyle = PAPER
   fitFont(ctx, profile.name.toUpperCase(), h * 0.44, F_POSTER, 54)
   ctx.fillText(profile.name.toUpperCase(), h * 0.25, 2)
-  fitFont(ctx, 'SENIOR DEVELOPER', h * 0.44, F_POSTER, 54)
-  ctx.fillText('SENIOR DEVELOPER', h * 0.75, 2)
+  fitFont(ctx, 'JUNIOR DEVELOPER', h * 0.44, F_POSTER, 54)
+  ctx.fillText('JUNIOR DEVELOPER', h * 0.75, 2)
   ctx.font = `400 34px ${F_POSTER}`
   ctx.fillStyle = PAPER_DARK
   ctx.fillText('✦', h * 0.5, 2)
