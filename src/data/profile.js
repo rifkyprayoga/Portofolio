@@ -65,7 +65,7 @@ export const experience = [
   {
     type: 'work',
     org: 'IconPlus',
-    role: { id: 'Tukang Lap Kaca Gedung | Office Boy', en: 'Building Window Cleaner | Office Boy' },
+    role: 'Dev Ops | Senior Mobile Developer',
     start: '2022',
     end: null,
     logo: '',
@@ -87,7 +87,7 @@ export const experience = [
     end: '2021',
     logo: '',
   },
-  { type: 'work', org: 'Iwan Tirta', role: 'Office Boy', start: '2020', end: '2020', logo: '' },
+  { type: 'work', org: 'Iwan Tirta', role: 'Fullstack Developer', start: '2020', end: '2020', logo: '' },
 ]
 
 const OTOMASI = { id: 'Otomasi & Bot', en: 'Automation & Bots' }
